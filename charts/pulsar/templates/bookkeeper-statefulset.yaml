@@ -139,6 +139,7 @@ spec:
                 topologyKey: {{ .Values.bookkeeper.affinity.anti_affinity_topology_key }}
         {{ end }}
         {{- end }}
+        {{- end }}
       terminationGracePeriodSeconds: {{ .Values.bookkeeper.gracePeriod }}
     {{- if and .Values.rbac.enabled .Values.rbac.psp }}
       serviceAccountName: "{{ template "pulsar.fullname" . }}-{{ .Values.bookkeeper.component }}"
