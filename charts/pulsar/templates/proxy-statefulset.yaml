@@ -61,6 +61,55 @@ spec:
       tolerations:
 {{ toYaml .Values.proxy.tolerations | indent 8 }}
     {{- end }}
+      {{- if .Values.proxy.affinity.enableProdMode }}
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 1
+            preference:
+              matchExpressions:
+              # - key: eks.amazonaws.com/nodegroup
+              - key: appgroup
+                operator: In
+                values:
+                - pulsar-a
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: "app"
+                      operator: In
+                      values:
+                      - "{{ template "pulsar.name" . }}"
+                    - key: "release"
+                      operator: In
+                      values:
+                      - {{ .Release.Name }}
+                    - key: "component" 
+                      operator: In
+                      values:
+                      - {{ .Values.proxy.component }}
+                topologyKey: "kubernetes.io/zone"
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: "app"
+                      operator: In
+                      values:
+                      - "{{ template "pulsar.name" . }}"
+                    - key: "release"
+                      operator: In
+                      values:
+                      - {{ .Release.Name }}
+                    - key: "component" 
+                      operator: In
+                      values:
+                      - {{ .Values.proxy.component }}
+                topologyKey: "kubernetes.io/hostname"
+      {{- else }}
       affinity:
         {{- if and .Values.affinity.anti_affinity .Values.proxy.affinity.anti_affinity}}
         podAntiAffinity:
@@ -102,6 +151,7 @@ spec:
                 topologyKey: {{ .Values.proxy.affinity.anti_affinity_topology_key }}
         {{ end }}
         {{- end }}
+      {{- end }}
       terminationGracePeriodSeconds: {{ .Values.proxy.gracePeriod }}
     {{- if and .Values.rbac.enabled .Values.rbac.psp }}
       serviceAccountName: "{{ template "pulsar.fullname" . }}-{{ .Values.proxy.component }}"
