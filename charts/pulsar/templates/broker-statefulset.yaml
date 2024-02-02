@@ -62,6 +62,55 @@ spec:
       tolerations:
 {{ toYaml .Values.broker.tolerations | indent 8 }}
     {{- end }}
+      {{- if .Values.broker.affinity.enableProdMode }}
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 1
+            preference:
+              matchExpressions:
+              # - key: eks.amazonaws.com/nodegroup
+              - key: appgroup
+                operator: In
+                values:
+                - pulsar-a
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: "app"
+                      operator: In
+                      values:
+                      - "{{ template "pulsar.name" . }}"
+                    - key: "release"
+                      operator: In
+                      values:
+                      - {{ .Release.Name }}
+                    - key: "component" 
+                      operator: In
+                      values:
+                      - {{ .Values.broker.component }}
+                topologyKey: "kubernetes.io/hostname"
+            - weight: 5
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: "app"
+                      operator: In
+                      values:
+                      - "{{ template "pulsar.name" . }}"
+                    - key: "release"
+                      operator: In
+                      values:
+                      - {{ .Release.Name }}
+                    - key: "component" 
+                      operator: In
+                      values:
+                      - {{ .Values.broker.component }}
+                topologyKey: "kubernetes.io/zone"
+      {{- else }}
       affinity:
         {{- if and .Values.affinity.anti_affinity .Values.broker.affinity.anti_affinity}}
         podAntiAffinity:
@@ -103,6 +152,7 @@ spec:
                 topologyKey: {{ .Values.broker.affinity.anti_affinity_topology_key }}
         {{ end }}
         {{- end }}
+      {{- end }}
       terminationGracePeriodSeconds: {{ .Values.broker.gracePeriod }}
       initContainers:
       # This init container will wait for zookeeper to be ready before
