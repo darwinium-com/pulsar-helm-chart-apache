@@ -39,9 +39,9 @@ spec:
   template:
     metadata:
       labels:
+        dwn/app: pulsar-bookkeeper
         {{- include "pulsar.template.labels" . | nindent 8 }}
         component: {{ .Values.bookkeeper.component }}
-        dwn/app: pulsar-bookkeeper
       annotations:
         prometheus.io/scrape: "true"
         prometheus.io/port: "{{ .Values.bookkeeper.ports.http }}"
