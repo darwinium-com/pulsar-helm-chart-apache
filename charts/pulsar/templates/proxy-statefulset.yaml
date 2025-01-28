@@ -41,6 +41,7 @@ spec:
   template:
     metadata:
       labels:
+        dwn/app: pulsar-proxy
         {{- include "pulsar.template.labels" . | nindent 8 }}
         component: {{ .Values.proxy.component }}
       annotations:
