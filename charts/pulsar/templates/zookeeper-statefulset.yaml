@@ -40,6 +40,7 @@ spec:
   template:
     metadata:
       labels:
+        dwn/app: pulsar-zookeeper
         {{- include "pulsar.template.labels" . | nindent 8 }}
         component: {{ .Values.zookeeper.component }}
       annotations:
