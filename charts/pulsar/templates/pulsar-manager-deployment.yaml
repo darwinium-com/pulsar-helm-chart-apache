@@ -35,6 +35,7 @@ spec:
   template:
     metadata:
       labels:
+        dwn/app: pulsar-manager
         {{- include "pulsar.template.labels" . | nindent 8 }}
         component: {{ .Values.pulsar_manager.component }}
       annotations:
