@@ -39,6 +39,7 @@ spec:
   template:
     metadata:
       labels:
+        dwn/app: pulsar-toolset
         {{- include "pulsar.template.labels" . | nindent 8 }}
         component: {{ .Values.toolset.component }}
       annotations:
