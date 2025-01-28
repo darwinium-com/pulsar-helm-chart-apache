@@ -41,6 +41,7 @@ spec:
   template:
     metadata:
       labels:
+        dwn/app: pulsar-broker
         {{- include "pulsar.template.labels" . | nindent 8 }}
         component: {{ .Values.broker.component }}
       annotations:
